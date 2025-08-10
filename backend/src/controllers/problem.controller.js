@@ -1,3 +1,5 @@
+import { pollBatchResults, submitBatch } from "../libs/judge0.lib.js";
+
 export const createProblem = async (req, res) => {
   try {
     const {
@@ -6,25 +8,78 @@ export const createProblem = async (req, res) => {
       description,
       difficulty,
       tags,
-      userId,
       examples,
       constraints,
       hints,
       testCases,
       codeSnippets,
       referenceSolutions,
+      editorial, 
     } = req.body;
 
-    if (req.user !== "ADMIN")
+    // Role check
+    if (req.user.role !== "ADMIN") {
       return res
         .status(403)
-        .json({ error: "You are not allowed to create a problem !" });
+        .json({ error: "You are not allowed to create a problem!" });
+    }
 
     try {
-      for (const [language, solutionCode] of object.entries(codeSnippet)) {
-        const languageId = getJudge0LanguageId(language)
+      for (const [language, solutionCode] of Object.entries(codeSnippets)) {
+        const languageId = getJudge0LanguageId(language);
+        if (!languageId) {
+          return res.status(400).json({
+            error: `Language ${language} is not supported`,
+          });
+        }
+
+        const submissions = testCases.map(({ input, output }) => ({
+          source_code: solutionCode,
+          language_id: languageId,
+          stdin: input,
+          expected_output: output,
+        }));
+
+        const submissionResults = await submitBatch(submissions);
+        const tokens = submissionResults.map((r) => r.token);
+        const results = await pollBatchResults(tokens);
+
+        for (let i = 0; i < results.length; i++) {
+          if (results[i].status.id !== 3) {
+            return res.status(400).json({
+              error: `TestCase ${i + 1} failed for language ${language}`,
+            });
+          }
+        }
       }
-    } catch (error) {}
+
+      const newProblem = await db.problem.create({
+        data: {
+          id,
+          title,
+          description,
+          difficulty,
+          tags,
+          examples,
+          constraints,
+          testCases,
+          codeSnippets,
+          hints,
+          editorial,
+          referenceSolutions,
+          userId: req.user.id,
+        },
+      });
+
+      return res.status(201).json({
+        message: "Problem created successfully",
+        data: newProblem,
+        success: true,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Error while validating problem" });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ err: "Server error" });
