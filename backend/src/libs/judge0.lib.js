@@ -1,5 +1,6 @@
 import axios from "axios";
 
+
 export function getLanguageName(languageId) {
   const LANGUAGE_NAMES = {
     71: "PYTHON",
@@ -9,9 +10,16 @@ export function getLanguageName(languageId) {
   return LANGUAGE_NAMES[languageId.toUpperCase()];
 }
 
+export function getJudge0LanguageId(language) {
+  const LANGUAGE_ID = {
+    PYTHON: 71,
+    JAVA: 62,
+    JAVASCRIPT: 63,
+  };
+  return LANGUAGE_ID[language]
+}
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 
 export const pollBatchResults = async (tokens) => {
   const maxAttempts = 30; // Prevent infinite loops
@@ -20,14 +28,14 @@ export const pollBatchResults = async (tokens) => {
   while (attempts < maxAttempts) {
     try {
       const { data } = await axios.get(
-        `${process.env.JUDGE0_API_URL}/submissions/batch`,
+        `${process.env.SULU_API_URL}/submissions/batch`,
         {
           params: {
             tokens: tokens.join(","),
             base64_encoded: false,
           },
           headers: {
-            Authorization: `Bearer ${process.env.JUDGE0_AUTH}`,
+            Authorization: `Bearer ${process.env.SULU_API_KEY}`,
           },
         }
       );
@@ -58,16 +66,15 @@ export const pollBatchResults = async (tokens) => {
   throw new Error("Polling timeout: Results took too long to process");
 };
 
-
 export const submitBatch = async (submissions) => {
   try {
     const options = {
       method: "POST",
-      url: `${process.env.JUDGE0_API_URL}/submissions/batch`,
+      url: `${process.env.SULU_API_URL}/submissions/batch`,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        Authorization: `Bearer ${process.env.JUDGE0_AUTH}`,
+        Authorization: `Bearer ${process.env.SULU_API_KEY}`,
       },
       data: {
         submissions,

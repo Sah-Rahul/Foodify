@@ -13,13 +13,13 @@ const problemRoutes = express.Router();
 
 problemRoutes.post( "/create-problem", userMiddleware, checkAdmin, createProblem);
 
-problemRoutes.post("/get-all-problems", userMiddleware, getAllProblems);
+problemRoutes.get("/get-all-problems", userMiddleware, getAllProblems);
 
-problemRoutes.post("/get-all-problem/:id", userMiddleware, getAllProblemById);
+problemRoutes.get("/get-all-problem/:id", userMiddleware, getAllProblemById);
 
-problemRoutes.post("/update-problem/:id", userMiddleware, checkAdmin, updateProblem );
+problemRoutes.put("/update-problem/:id", userMiddleware, checkAdmin, updateProblem );
 
-problemRoutes.post( "/update-delete/:id", userMiddleware, checkAdmin, deleteProblem);
+problemRoutes.delete( "/delete-problem/:id", userMiddleware, checkAdmin, deleteProblem);
 
 problemRoutes.post( "/get-solved-problems", userMiddleware, getAllProblemsSolvedByUser);
 
