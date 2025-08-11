@@ -22,7 +22,7 @@ export const createProblem = async (req, res) => {
       editorial,
     } = req.body;
 
-    console.log('constraints-----' , constraints)
+    console.log("constraints-----", constraints);
     // Role check
     if (req.user.role !== "ADMIN") {
       return res
@@ -79,13 +79,17 @@ export const createProblem = async (req, res) => {
       });
 
       return res.status(201).json({
+        success: true,
         message: "Problem created successfully",
         data: newProblem,
         success: true,
       });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: "Error while validating problem" });
+
+      res
+        .status(500)
+        .json({ success: false, error: "Error while validating problem" });
     }
   } catch (error) {
     console.error(error);
@@ -101,9 +105,11 @@ export const getAllProblems = async (req, res) => {
       return res.status(404).json({ message: "problems not found !" });
     }
 
-    return res
-      .status(200)
-      .json({ message: "All problems fetch successfully", problems });
+    return res.status(200).json({
+      success: true,
+      message: "All problems fetch successfully",
+      problems,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -123,12 +129,14 @@ export const getAllProblemById = async (req, res) => {
       return res.status(404).json({ message: "ProblemById not found !" });
     }
 
-    return res
-      .status(200)
-      .json({ message: "ProblemById fetch successfully", ProblemById });
+    return res.status(200).json({
+      success: true,
+      message: "ProblemById fetch successfully",
+      ProblemById,
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
@@ -200,14 +208,18 @@ export const updateProblem = async (req, res) => {
 
       res
         .status(200)
-        .json({ message: "problemUpdated successfulliy", updatedProblem });
+        .json({
+          success: true,
+          message: "problemUpdated successfulliy",
+          updatedProblem,
+        });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Server error" });
+      res.status(500).json({ success: false, message: "Server error" });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
@@ -225,7 +237,9 @@ export const deleteProblem = async (req, res) => {
       },
     });
     if (!deleteProblem) {
-      return res.status(404).json({ message: "noProblem found !" });
+      return res
+        .status(404)
+        .json({ success: false, message: "noProblem found !" });
     }
     const deletedProblem = await db.problem.delete({
       where: {
@@ -234,10 +248,10 @@ export const deleteProblem = async (req, res) => {
     });
     return res
       .status(200)
-      .json({ message: "Problem is deleted !", deletedProblem });
+      .json({ success: true, message: "Problem is deleted !", deletedProblem });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
@@ -245,6 +259,6 @@ export const getAllProblemsSolvedByUser = async (req, res) => {
   try {
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
