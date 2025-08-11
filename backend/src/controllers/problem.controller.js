@@ -206,13 +206,11 @@ export const updateProblem = async (req, res) => {
         },
       });
 
-      res
-        .status(200)
-        .json({
-          success: true,
-          message: "problemUpdated successfulliy",
-          updatedProblem,
-        });
+      res.status(200).json({
+        success: true,
+        message: "problemUpdated successfulliy",
+        updatedProblem,
+      });
     } catch (error) {
       console.error(error);
       res.status(500).json({ success: false, message: "Server error" });
