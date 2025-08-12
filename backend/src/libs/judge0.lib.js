@@ -7,7 +7,7 @@ export function getLanguageName(languageId) {
     62: "JAVA",
     63: "JAVASCRIPT",
   };
-  return LANGUAGE_NAMES[languageId.toUpperCase()];
+  return LANGUAGE_NAMES[languageId];
 }
 
 export function getJudge0LanguageId(language) {
