@@ -5,17 +5,17 @@ import { addProblemToPlaylist, createPlayList, deletePlayList, getPlayAllListDet
 const playListRoute = express.Router();
 
  
-playListRoute.get("/playlist" , userMiddleware , getPlayAllListDetails)
+playListRoute.get("/get-all-playlist" , userMiddleware , getPlayAllListDetails)
 
 playListRoute.get("/playlist/:playlistId" , userMiddleware , getPlayListDetails)
 
 playListRoute.post("/create-playlist" ,userMiddleware ,  createPlayList)
 
-playListRoute.post('/:playlistId/add-problem' , userMiddleware , addProblemToPlaylist)
+playListRoute.post('/add-problem/:playlistId' , userMiddleware , addProblemToPlaylist)
 
-playListRoute.delete("/:playlistId" , userMiddleware , deletePlayList)
+playListRoute.delete("/delete-playlist/:playlistId" , userMiddleware , deletePlayList)
 
-playListRoute.delete("/:playlistId/remove-problem" , userMiddleware , removeProblemFromPlaylist)
+playListRoute.delete("/remove-problem/:playlistId" , userMiddleware , removeProblemFromPlaylist)
 
 
 
