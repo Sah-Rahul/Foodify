@@ -151,3 +151,12 @@ export const executeCode = async (req, res) => {
     res.status(500).json({ error: "Failed to execute code" });
   }
 };
+
+
+export const submissionRoutes = () =>{
+  try {
+    
+  } catch (error) {
+    
+  }
+}
