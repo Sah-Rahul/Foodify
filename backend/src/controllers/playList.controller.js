@@ -77,31 +77,59 @@ export const addProblemToPlaylist = async (req, res) => {
   const { playlistId } = req.params;
   const { problemIds } = req.body;
 
-  if (!playlistId)
-    return res.status(400).json({ error: "Playlist ID required" });
+  // Validate playlistId
+  if (!playlistId || typeof playlistId !== 'string') {
+    return res.status(400).json({ error: "Invalid or missing playlistId" });
+  }
+
+  // Validate problemIds
   if (!Array.isArray(problemIds) || problemIds.length === 0) {
     return res.status(400).json({ error: "Invalid or missing problemIds" });
   }
 
   try {
-    // Avoid duplicates
+    // ✅ 1. Check if playlist exists
+    const playlistExists = await db.playlist.findUnique({
+      where: { id: playlistId },
+    });
+
+    if (!playlistExists) {
+      return res.status(404).json({ error: "Playlist not found" });
+    }
+
+    // ✅ 2. Filter out invalid problemIds
+    const validProblems = await db.problem.findMany({
+      where: { id: { in: problemIds } },
+      select: { id: true },
+    });
+
+    const validProblemIds = validProblems.map(p => p.id);
+    const invalidIds = problemIds.filter(id => !validProblemIds.includes(id));
+
+    if (validProblemIds.length === 0) {
+      return res.status(400).json({
+        error: "All problemIds are invalid",
+        invalidIds
+      });
+    }
+
+    // ✅ 3. Avoid duplicates
     const existing = await db.problemInPlaylist.findMany({
-      where: { playListId: playlistId, problemId: { in: problemIds } },
+      where: { playListId: playlistId, problemId: { in: validProblemIds } },
       select: { problemId: true },
     });
 
     const existingIds = existing.map((p) => p.problemId);
-    const newProblemIds = problemIds.filter((id) => !existingIds.includes(id));
+    const newProblemIds = validProblemIds.filter(id => !existingIds.includes(id));
 
     if (newProblemIds.length === 0) {
-      return res
-        .status(400)
-        .json({ error: "All problems already in playlist" });
+      return res.status(400).json({ error: "All problems already in playlist" });
     }
 
+    // ✅ 4. Insert valid, non-duplicate problemIds
     const problemsInPlaylist = await db.problemInPlaylist.createMany({
       data: newProblemIds.map((problemId) => ({
-        playListId: playlistId, // yaha bhi correct spelling
+        playListId: playlistId,
         problemId,
       })),
     });
@@ -109,13 +137,17 @@ export const addProblemToPlaylist = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Problems added to playlist successfully",
-      problemsInPlaylist,
+      added: problemsInPlaylist,
+      skipped: existingIds,
+      invalidIds
     });
+
   } catch (error) {
     console.error("Error adding problems:", error.message);
     res.status(500).json({ error: "Failed to add problems to playlist" });
   }
-};
+};``
+
 
 // Delete a playlist
 export const deletePlayList = async (req, res) => {
@@ -140,7 +172,6 @@ export const deletePlayList = async (req, res) => {
 };
 
 // Remove problems from playlist
-// Remove problems from playlist
 export const removeProblemFromPlaylist = async (req, res) => {
   const { playlistId } = req.params;
   const { problemIds } = req.body;
@@ -162,7 +193,7 @@ export const removeProblemFromPlaylist = async (req, res) => {
       select: { problemId: true },
     });
 
-    const validProblemIds = existingProblems.map(p => p.problemId);
+    const validProblemIds = existingProblems.map((p) => p.problemId);
 
     if (validProblemIds.length === 0) {
       return res
@@ -190,4 +221,3 @@ export const removeProblemFromPlaylist = async (req, res) => {
       .json({ error: "Failed to remove problem(s) from playlist" });
   }
 };
-
