@@ -45,7 +45,7 @@ const ForgotPassword = () => {
           Forgot Password
         </h1>
 
-        {/* Form */}
+        
         <form className="space-y-4" onSubmit={handleSubmit} noValidate>
           <div>
             <Label htmlFor="email">Email</Label>
@@ -85,7 +85,7 @@ const ForgotPassword = () => {
           )}
         </form>
 
-        {/* Back to Login */}
+        
         <p className="mt-4 text-center text-sm text-gray-600">
           Remembered your password{" "} ? {" "}
           <Link

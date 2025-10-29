@@ -44,7 +44,7 @@ const ResetPassword = () => {
       return;
     }
 
-    // ✅ Simulate API success
+    
     setTimeout(() => {
       setLoading(false);
       console.log("✅ Reset Password Data:", formData);
@@ -61,7 +61,7 @@ const ResetPassword = () => {
         </h1>
 
         <form className="space-y-4" onSubmit={handleSubmit} noValidate>
-          {/* New Password */}
+          
           <div>
             <Label htmlFor="password">New Password</Label>
             <div className="relative mt-2">
