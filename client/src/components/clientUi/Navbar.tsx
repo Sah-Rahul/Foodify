@@ -10,7 +10,7 @@ import {
 import { Sun, Moon, ShoppingCart, User, Menu, X } from "lucide-react";
 
 const Navbar = () => {
-  const admin = false;
+  const admin = true;
   const [darkMode, setDarkMode] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -23,14 +23,12 @@ const Navbar = () => {
     <nav className="bg-white dark:bg-gray-900 shadow-sm fixed top-0 left-0 w-full z-50">
       <div className="max-w-7xl mx-auto px-6 md:px-14">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <h2 className="font-bold md:font-extrabold text-2xl text-gray-900 dark:text-white">
               FoodiFy
             </h2>
           </Link>
 
-          {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-8">
             <Link
               to="/"
@@ -51,7 +49,6 @@ const Navbar = () => {
               Order
             </Link>
 
-            {/* Admin Menu */}
             {admin && (
               <Menubar>
                 <MenubarMenu>
@@ -80,9 +77,7 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Right Icons */}
           <div className="flex items-center gap-4">
-            {/* Light/Dark Mode Toggle */}
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -94,7 +89,6 @@ const Navbar = () => {
               )}
             </button>
 
-            {/* Cart */}
             <Link
               to="/cart"
               className="relative p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
@@ -105,7 +99,6 @@ const Navbar = () => {
               </span>
             </Link>
 
-            {/* User Profile */}
             <Link
               to="/profile"
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
@@ -113,15 +106,12 @@ const Navbar = () => {
               <User className="w-5 h-5 text-gray-700 dark:text-gray-300" />
             </Link>
 
-            {/* Login Button */}
             <Link
               to="/login"
               className="hidden md:block bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition"
             >
               Login
             </Link>
-
-            {/* Mobile Menu Toggle */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="md:hidden p-2 text-gray-700 dark:text-gray-200"
@@ -131,7 +121,6 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {menuOpen && (
           <div className="md:hidden flex flex-col items-start gap-4 py-4 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
             <Link to="/" onClick={() => setMenuOpen(false)}>

@@ -9,6 +9,10 @@ import ResetPassword from "./pages/auth/ResetPassword";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import Profile from "./components/clientUi/Profile";
 import SearchFood from "./components/clientUi/SearchFood";
+import ResturentMenu from "./components/clientUi/ResturentMenu";
+import Cart from "./components/clientUi/Cart";
+import Resturent from "./admin/Resturent";
+import AddMenu from "./admin/AddMenu";
 
 const App = () => {
   return (
@@ -19,12 +23,19 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/search-food/:id" element={<SearchFood />} />
+          <Route path="/resturent/:id" element={<ResturentMenu />} />
+          <Route path="/cart" element={<Cart />} />
 
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
+
+         //  admin routes 
+          <Route path="/admin/resturent" element={<Resturent />} />
+          <Route path="/admin/menu" element={<AddMenu />} />
+
         </Routes>
       </div>
       <Footer />

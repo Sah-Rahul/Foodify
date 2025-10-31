@@ -1,4 +1,11 @@
-import { Mail, LocateIcon, MapPin, MapPinnedIcon, Plus, Loader2 } from "lucide-react";
+import {
+  Mail,
+  LocateIcon,
+  MapPin,
+  MapPinnedIcon,
+  Plus,
+  Loader2,
+} from "lucide-react";
 import { useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { Button } from "../ui/button";
@@ -11,7 +18,6 @@ const Profile = () => {
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // Handle file upload and preview
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -24,12 +30,11 @@ const Profile = () => {
     }
   };
 
-  // Form submit handler
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       setIsLoading(true);
-      // Simulate an API call delay (e.g. profile update)
+
       await new Promise((resolve) => setTimeout(resolve, 2000));
       console.log("Profile updated successfully ✅");
     } catch (err) {
@@ -44,15 +49,12 @@ const Profile = () => {
       onSubmit={handleSubmit}
       className="max-w-7xl mx-auto px-6 md:px-14 py-10"
     >
-      {/* Header Section */}
       <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6">
         <div className="flex items-center gap-4">
-          {/* Avatar */}
           <Avatar className="relative w-24 h-24 md:w-28 md:h-28">
             <AvatarImage src={selectedImage} />
             <AvatarFallback>U</AvatarFallback>
 
-            {/* Hidden file input */}
             <input
               ref={imageRef}
               type="file"
@@ -61,7 +63,6 @@ const Profile = () => {
               className="hidden"
             />
 
-            {/* Hover overlay for image upload */}
             <div
               onClick={() => imageRef.current?.click()}
               className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 bg-black/50 rounded-full cursor-pointer transition"
@@ -70,7 +71,6 @@ const Profile = () => {
             </div>
           </Avatar>
 
-          {/* Name Input */}
           <Input
             type="text"
             placeholder="Your Full Name"
@@ -79,9 +79,7 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Info Fields */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-10">
-        {/* Email */}
         <div className="flex items-center gap-3 rounded-md p-3 bg-gray-100 dark:bg-gray-800">
           <Mail className="text-gray-500" />
           <div className="w-full">
@@ -95,7 +93,6 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Address */}
         <div className="flex items-center gap-3 rounded-md p-3 bg-gray-100 dark:bg-gray-800">
           <LocateIcon className="text-gray-500" />
           <div className="w-full">
@@ -108,7 +105,6 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* City */}
         <div className="flex items-center gap-3 rounded-md p-3 bg-gray-100 dark:bg-gray-800">
           <MapPin className="text-gray-500" />
           <div className="w-full">
@@ -121,7 +117,6 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Country */}
         <div className="flex items-center gap-3 rounded-md p-3 bg-gray-100 dark:bg-gray-800">
           <MapPinnedIcon className="text-gray-500" />
           <div className="w-full">
@@ -135,7 +130,6 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Update Button */}
       <div className="text-center mt-8">
         <Button
           type="submit"

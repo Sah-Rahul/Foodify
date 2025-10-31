@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -6,12 +6,12 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Globe, MapPin, X } from "lucide-react";
 import Filters from "./Filters";
+import { Link } from "react-router-dom";
 
 const SearchFood = () => {
   const [searchQuery, setSearchQuery] = useState("");
   // const [loading, setLoading] = useState(false);
 
- 
   const pizzaRestaurants = [
     {
       _id: "1",
@@ -43,7 +43,9 @@ const SearchFood = () => {
   ];
 
   const appliedFilters = ["Pizza", "Italian"];
-
+  useEffect(() => {
+    window.scroll(0, 0);
+  }, []);
   return (
     <div className="max-w-7xl mx-auto my-10 px-4">
       <div className="flex flex-col md:flex-row justify-between gap-10">
@@ -146,9 +148,11 @@ const SearchFood = () => {
                     </div>
                   </CardContent>
                   <CardFooter className="p-4 border-t dark:border-t-gray-700 border-t-gray-100 text-white flex justify-end">
-                    <Button className="bg-orange-500 hover:bg-orange-600 font-semibold py-2 px-4 rounded-full shadow-md transition-colors duration-200">
-                      View Menus
-                    </Button>
+                    <Link to={`/resturent/${123}`}>
+                      <Button className="bg-orange-500 hover:bg-orange-600 font-semibold py-2 px-4 rounded-full shadow-md transition-colors duration-200">
+                        View Menus
+                      </Button>
+                    </Link>
                   </CardFooter>
                 </Card>
               ))}
