@@ -7,6 +7,8 @@ import Signup from "./pages/auth/Signup";
 import VerifyEmail from "./pages/auth/VerifyEmail";
 import ResetPassword from "./pages/auth/ResetPassword";
 import ForgotPassword from "./pages/auth/ForgotPassword";
+import Profile from "./components/clientUi/Profile";
+import SearchFood from "./components/clientUi/SearchFood";
 
 const App = () => {
   return (
@@ -15,6 +17,9 @@ const App = () => {
       <div className="min-h-[80vh] pt-16">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/search-food/:id" element={<SearchFood />} />
+
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
