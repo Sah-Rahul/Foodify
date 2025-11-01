@@ -80,7 +80,7 @@ const Navbar = () => {
           <div className="flex items-center gap-4">
             <button
               onClick={toggleDarkMode}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="p-2 cursor-pointer rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
             >
               {darkMode ? (
                 <Sun className="w-5 h-5 text-yellow-400" />

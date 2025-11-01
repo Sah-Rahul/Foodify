@@ -13,6 +13,8 @@ import ResturentMenu from "./components/clientUi/ResturentMenu";
 import Cart from "./components/clientUi/Cart";
 import Resturent from "./admin/Resturent";
 import AddMenu from "./admin/AddMenu";
+import Orders from "./admin/Orders";
+import Order from "./components/clientUi/Order";
 
 const App = () => {
   return (
@@ -31,10 +33,12 @@ const App = () => {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/order" element={<Order />} />
 
          //  admin routes 
           <Route path="/admin/resturent" element={<Resturent />} />
           <Route path="/admin/menu" element={<AddMenu />} />
+          <Route path="/admin/orders" element={<Orders />} />
 
         </Routes>
       </div>
