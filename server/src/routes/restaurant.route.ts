@@ -7,7 +7,7 @@ import { createRestaurant, getRestaurant, getRestaurantOrder, getSingleRestauran
 const restaurantRouter = express.Router();
 
  
-restaurantRouter.post("/", isAuthenticated, upload.single("imageFile"), createRestaurant);
+restaurantRouter.post("/create", isAuthenticated, upload.single("imageFile"), createRestaurant);
 
 restaurantRouter.get("/", isAuthenticated, getRestaurant);
 

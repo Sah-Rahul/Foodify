@@ -19,13 +19,16 @@ export const useRestaurantStore = create<RestaurantState>()(
       singleRestaurant: null,
       restaurantOrder: [],
 
-      // Create restaurant
-      createRestaurant: async (formData: FormData) => {
+      createRestaurant: async (submissionData: FormData) => {
         try {
           set({ loading: true });
-          const response = await axios.post(`${API_END_POINT}/`, formData, {
-            headers: { "Content-Type": "multipart/form-data" },
-          });
+          const response = await axios.post(
+            `${API_END_POINT}/create`,
+            submissionData,
+            {
+              headers: { "Content-Type": "multipart/form-data" },
+            }
+          );
           if (response.data.success) {
             toast.success(response.data.message);
           }
@@ -36,13 +39,13 @@ export const useRestaurantStore = create<RestaurantState>()(
         }
       },
 
-      // Get all restaurants
       getRestaurant: async () => {
         try {
           set({ loading: true });
           const response = await axios.get(`${API_END_POINT}/`);
           if (response.data.success) {
             set({ restaurant: response.data.restaurant });
+            return response.data.restaurant;
           }
         } catch (error: any) {
           if (error?.response?.status === 404) set({ restaurant: null });
@@ -51,7 +54,6 @@ export const useRestaurantStore = create<RestaurantState>()(
         }
       },
 
-      // Update restaurant
       updateRestaurant: async (formData: FormData) => {
         try {
           set({ loading: true });
@@ -68,7 +70,6 @@ export const useRestaurantStore = create<RestaurantState>()(
         }
       },
 
-      // Search restaurants
       searchRestaurant: async (
         searchText: string,
         searchQuery: string,
@@ -93,7 +94,6 @@ export const useRestaurantStore = create<RestaurantState>()(
         }
       },
 
-      // Add menu
       addMenuToRestaurant: (menu: MenuItem) => {
         set((state) => ({
           restaurant: state.restaurant
@@ -102,7 +102,6 @@ export const useRestaurantStore = create<RestaurantState>()(
         }));
       },
 
-      // Update menu
       updateMenuToRestaurant: (updatedMenu: MenuItem) => {
         set((state) => {
           if (!state.restaurant) return state;
@@ -116,7 +115,6 @@ export const useRestaurantStore = create<RestaurantState>()(
         });
       },
 
-      // Filters
       setAppliedFilter: (value: string) => {
         set((state) => {
           const isApplied = state.appliedFilter.includes(value);
@@ -130,7 +128,6 @@ export const useRestaurantStore = create<RestaurantState>()(
 
       resetAppliedFilter: () => set({ appliedFilter: [] }),
 
-      // Single restaurant
       getSingleRestaurant: async (restaurantId: string) => {
         try {
           const response = await axios.get(`${API_END_POINT}/${restaurantId}`);
@@ -142,7 +139,6 @@ export const useRestaurantStore = create<RestaurantState>()(
         }
       },
 
-      // Restaurant orders
       getRestaurantOrders: async () => {
         try {
           const response = await axios.get(`${API_END_POINT}/order`);
@@ -175,8 +171,8 @@ export const useRestaurantStore = create<RestaurantState>()(
         }
       },
     }),
-    {
-      name: "restaurant-store",
+   {
+      name: "restaurent-storage",
       storage: createJSONStorage(() => localStorage),
     }
   )

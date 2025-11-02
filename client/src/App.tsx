@@ -30,7 +30,7 @@ const App = () => {
   // checking auth every time when page is loaded
   useEffect(() => {
     checkAuthentication();
-  }, [checkAuthentication]);
+  }, []);
 
   if (isCheckingAuth) return <Loading />;
   return (

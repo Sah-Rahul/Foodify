@@ -37,5 +37,5 @@ const menuSchema = new Schema<IMenuDocument>(
   }
 );
 
-// ✅ Strongly typed model
+ 
 export const Menu = mongoose.model<IMenuDocument>("Menu", menuSchema);

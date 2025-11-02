@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { Order } from "../models/order.model";
 import { Restaurant } from "../models/restaurant.model";
 import uploadImageOnCloudinary from "../utils/imageUpload";
+import { Menu } from "../models/menu.model";
 
 export const createRestaurant = async (req: Request, res: Response) => {
   try {
@@ -10,8 +11,9 @@ export const createRestaurant = async (req: Request, res: Response) => {
     const file = req.file;
 
     const existingRestaurant = await Restaurant.findOne({
-      user: (req as any).id,
+      user: (req as any).userId,
     });
+
     if (existingRestaurant) {
       return res.status(400).json({
         success: false,
@@ -26,15 +28,20 @@ export const createRestaurant = async (req: Request, res: Response) => {
       });
     }
 
+    const cuisinesArray =
+      typeof cuisines === "string"
+        ? cuisines.split(",").map((c) => c.trim())
+        : [];
+
     const imageUrl = await uploadImageOnCloudinary(file as Express.Multer.File);
 
     await Restaurant.create({
-      user: (req as any).id,
+      user: (req as any).userId, 
       restaurantName,
       city,
       country,
       deliveryTime,
-      cuisines: JSON.parse(cuisines),
+      cuisines: cuisinesArray,
       imageUrl,
     });
 
@@ -51,7 +58,7 @@ export const createRestaurant = async (req: Request, res: Response) => {
 export const getRestaurant = async (req: Request, res: Response) => {
   try {
     const restaurant = await Restaurant.findOne({
-      user: (req as any).id,
+      user: (req as any).userId,
     }).populate("menus");
 
     if (!restaurant) {
@@ -74,7 +81,7 @@ export const updateRestaurant = async (req: Request, res: Response) => {
     const { restaurantName, city, country, deliveryTime, cuisines } = req.body;
     const file = req.file;
 
-    const restaurant = await Restaurant.findOne({ user: (req as any).id });
+    const restaurant = await Restaurant.findOne({ user: (req as any).userId });  
     if (!restaurant) {
       return res.status(404).json({
         success: false,
@@ -86,7 +93,11 @@ export const updateRestaurant = async (req: Request, res: Response) => {
     restaurant.city = city || restaurant.city;
     restaurant.country = country || restaurant.country;
     restaurant.deliveryTime = deliveryTime || restaurant.deliveryTime;
-    restaurant.cuisines = cuisines ? JSON.parse(cuisines) : restaurant.cuisines;
+    restaurant.cuisines = cuisines
+      ? typeof cuisines === "string"
+        ? cuisines.split(",").map((c) => c.trim())
+        : cuisines
+      : restaurant.cuisines;
 
     if (file) {
       const imageUrl = await uploadImageOnCloudinary(
@@ -110,7 +121,7 @@ export const updateRestaurant = async (req: Request, res: Response) => {
 
 export const getRestaurantOrder = async (req: Request, res: Response) => {
   try {
-    const restaurant = await Restaurant.findOne({ user: (req as any).id });
+    const restaurant = await Restaurant.findOne({ user: (req as any).userId });
     if (!restaurant) {
       return res.status(404).json({
         success: false,

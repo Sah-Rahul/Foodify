@@ -7,6 +7,7 @@ import { connectDB } from "./src/config/db.ts";
 dotenv.config();
 
 // routes
+import "./src/models"; 
 import userRouter from "./src/routes/user.routes.ts";
 import resturentRouter from "./src/routes/restaurant.route.ts";
 import orderRouter from "./src/routes/order.route.ts";
@@ -27,7 +28,7 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 connectDB();
 
 app.use("/api/v1/user", userRouter);
-app.use("/api/v1/resturent", resturentRouter);
+app.use("/api/v1/restaurant", resturentRouter);
 app.use("/api/v1/order", orderRouter);
 
 app.get("/", (req, res) => {
