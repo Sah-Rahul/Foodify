@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Menubar,
   MenubarContent,
@@ -7,16 +7,27 @@ import {
   MenubarMenu,
   MenubarTrigger,
 } from "../ui/menubar";
-import { Sun, Moon, ShoppingCart, User, Menu, X } from "lucide-react";
+import { Sun, Moon, ShoppingCart, User, Menu, X, Loader2 } from "lucide-react";
+import { useUserStore } from "@/zustand/useUserStore";
 
 const Navbar = () => {
-  const admin = true;
+  const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user, logout, loading } = useUserStore();
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
     document.documentElement.classList.toggle("dark");
+  };
+
+  const logoutHandler = () => {
+    try {
+      logout();
+      navigate("/login");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -49,7 +60,7 @@ const Navbar = () => {
               Order
             </Link>
 
-            {admin && (
+            {user?.admin && (
               <Menubar>
                 <MenubarMenu>
                   <MenubarTrigger className="cursor-pointer text-gray-700 dark:text-gray-200">
@@ -112,6 +123,19 @@ const Navbar = () => {
             >
               Login
             </Link>
+            {loading ? (
+              <Loader2 />
+            ) : (
+              <>
+                <button
+                  onClick={logoutHandler}
+                  className="hidden cursor-pointer md:block bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition"
+                >
+                  Logout
+                </button>
+              </>
+            )}
+
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="md:hidden p-2 text-gray-700 dark:text-gray-200"
@@ -133,7 +157,7 @@ const Navbar = () => {
               Order
             </Link>
 
-            {admin && (
+            {user?.admin && (
               <>
                 <Link to="/admin/orders" onClick={() => setMenuOpen(false)}>
                   Admin Orders

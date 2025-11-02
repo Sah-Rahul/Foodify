@@ -3,14 +3,15 @@ import { loginSchema } from "@/zodSchema/authSchema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Label } from "@/components/ui/label";
 import type { LoginInterface } from "@/types/auth";
+import { useUserStore } from "@/zustand/useUserStore";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-
+  const { login, loading } = useUserStore();
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({
     email: "",
     password: "",
@@ -28,16 +29,14 @@ const Login = () => {
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+
     setErrors({});
 
     const validation = loginSchema.safeParse(loginData);
 
     if (!validation.success) {
-      setLoading(false);
-
       const fieldErrors: { email?: string; password?: string } = {};
       validation.error.issues.forEach((issue) => {
         const field = issue.path[0] as "email" | "password";
@@ -47,12 +46,12 @@ const Login = () => {
       setErrors(fieldErrors);
       return;
     }
-
-    setTimeout(() => {
-      setLoading(false);
-      console.log("✅ Login Data:", loginData);
-      alert("Login successful!");
-    }, 1500);
+    try {
+      await login(loginData);
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -116,7 +115,7 @@ const Login = () => {
             )}
           </div>
           <div className="text-end text-orange-500 underline">
-            <Link to={'/forgot-password'}>Forgot password</Link>
+            <Link to={"/forgot-password"}>Forgot password</Link>
           </div>
 
           {loading ? (
@@ -137,7 +136,6 @@ const Login = () => {
           )}
         </form>
 
-        
         <p className="mt-4 text-center text-sm text-gray-600">
           Don’t have an account?{" "}
           <Link

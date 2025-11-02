@@ -1,80 +1,42 @@
-import {
-  generatePasswordResetEmailHtml,
-  generateResetSuccessEmailHtml,
-  generateWelcomeEmailHtml,
-  htmlContent,
-} from "./emailTemplates";
-import { client, sender } from "./mailtrap";
+import nodemailer from "nodemailer";
+import dotenv from "dotenv";
 
-export const sendVerificationEmail = async (
-  email: string,
-  verificationToken: string
-) => {
-  const recipient = [{ email }];
+dotenv.config();
+
+interface EmailOptions {
+  email: string;
+  subject: string;
+  message: string;
+}
+
+export const sendEmail = async ({
+  email,
+  subject,
+  message,
+}: EmailOptions): Promise<void> => {
   try {
-    const res = await client.send({
-      from: sender,
-      to: recipient,
-      subject: "Verify your email",
-      html: htmlContent.replace("{verificationToken}", verificationToken),
-      category: "Email Verification",
-    });
-  } catch (error) {
-    console.log(error);
-    throw new Error("Failed to send email verification");
-  }
-};
-export const sendWelcomeEmail = async (email: string, name: string) => {
-  const recipient = [{ email }];
-  const htmlContent = generateWelcomeEmailHtml(name);
-  try {
-    const res = await client.send({
-      from: sender,
-      to: recipient,
-      subject: "Welcome to PatelEats",
-      html: htmlContent,
-      template_variables: {
-        company_info_name: "PatelEats",
-        name: name,
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      service: process.env.SMTP_SERVICE,
+      port: Number(process.env.SMTP_PORT),
+      secure: false,
+      auth: {
+        user: process.env.SMTP_MAIL,
+        pass: process.env.SMTP_PASSWORD,
       },
     });
-  } catch (error) {
-    console.log(error);
-    throw new Error("Failed to send welcome email");
-  }
-};
-export const sendPasswordResetEmail = async (
-  email: string,
-  resetURL: string
-) => {
-  const recipient = [{ email }];
-  const htmlContent = generatePasswordResetEmailHtml(resetURL);
-  try {
-    const res = await client.send({
-      from: sender,
-      to: recipient,
-      subject: "Reset your password",
-      html: htmlContent,
-      category: "Reset Password",
-    });
-  } catch (error) {
-    console.log(error);
-    throw new Error("Failed to reset password");
-  }
-};
-export const sendResetSuccessEmail = async (email: string) => {
-  const recipient = [{ email }];
-  const htmlContent = generateResetSuccessEmailHtml();
-  try {
-    const res = await client.send({
-      from: sender,
-      to: recipient,
-      subject: "Password Reset Successfully",
-      html: htmlContent,
-      category: "Password Reset",
-    });
-  } catch (error) {
-    console.log(error);
-    throw new Error("Failed to send password reset success email");
+
+    const mailOptions = {
+      from: `"Rahul Sah " <${process.env.SMTP_MAIL}>`,
+      to: email,
+      subject,
+      html: message,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("✅ Email sent successfully:", info.response);
+  } catch (error: any) {
+    console.error("❌ Email sending failed:", error.message);
+    throw new Error("Failed to send email");
   }
 };

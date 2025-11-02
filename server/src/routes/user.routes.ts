@@ -13,7 +13,7 @@ userRouter.post('/logout', logout)
 
 userRouter.post('/verify-email', verifyEmail)
 
-userRouter.post('/logout', isAuthenticated, checkAuth)
+userRouter.post('/check-auth', isAuthenticated, checkAuth)
 
 userRouter.post('/forgot-password', forgotPassword)
 

@@ -1,12 +1,7 @@
+import crypto from "crypto";
 
 export const generateVerificationCode = (length = 6): string => {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let verificationCode = ''; // 6 digit ka code isi me store hoga
-    const charactersLength = characters.length;
-  
-    for (let i = 0; i < length; i++) {
-      verificationCode += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-  
-    return verificationCode;
-}; 
+  const min = Math.pow(10, length - 1);  
+  const max = Math.pow(10, length) - 1; 
+  return crypto.randomInt(min, max + 1).toString();
+};

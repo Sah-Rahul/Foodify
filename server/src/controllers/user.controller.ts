@@ -9,8 +9,7 @@ import {
   sendWelcomeEmail,
   sendPasswordResetEmail,
   sendResetSuccessEmail,
-} from "../utils/email";
-import { generateVerificationCode } from "../utils/generateVerificationCode";
+} from "../utils/emailSender";
 
 export const signup = async (req: Request, res: Response) => {
   try {
@@ -24,7 +23,9 @@ export const signup = async (req: Request, res: Response) => {
       return res.status(409).json({ message: "User already exists." });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const verificationToken = generateVerificationCode();
+
+    // Generate email verification token
+    const verificationToken = crypto.randomInt(100000, 1000000).toString();
 
     const user = await User.create({
       fullname,
@@ -32,11 +33,13 @@ export const signup = async (req: Request, res: Response) => {
       password: hashedPassword,
       contact: Number(contact),
       verificationToken,
-      verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
+      verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24h
     });
 
-    generateToken(res, user);
+    // Send verification email
     await sendVerificationEmail(email, verificationToken);
+
+    generateToken(res, user);
 
     const userWithoutPassword = await User.findOne({ email }).select(
       "-password"
@@ -44,7 +47,7 @@ export const signup = async (req: Request, res: Response) => {
 
     return res.status(201).json({
       success: true,
-      message: "Account created successfully. Please verify your email.",
+      message: "Account created successfully. Verification email sent.",
       user: userWithoutPassword,
     });
   } catch (error) {
@@ -69,6 +72,7 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Incorrect email or password" });
 
     generateToken(res, user);
+
     user.lastLogin = new Date();
     await user.save();
 
@@ -107,11 +111,12 @@ export const verifyEmail = async (req: Request, res: Response) => {
     user.verificationTokenExpiresAt = undefined;
     await user.save();
 
+    // Send welcome email
     await sendWelcomeEmail(user.email, user.fullname);
 
     return res.status(200).json({
       success: true,
-      message: "Email verified successfully.",
+      message: "Email verified successfully. Welcome email sent.",
       user,
     });
   } catch (error) {
@@ -154,7 +159,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
     const resetToken = crypto.randomBytes(40).toString("hex");
     user.resetPasswordToken = resetToken;
-    user.resetPasswordTokenExpiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    user.resetPasswordTokenExpiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1h
     await user.save();
 
     await sendPasswordResetEmail(
@@ -194,7 +199,7 @@ export const resetPassword = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       success: true,
-      message: "Password reset successfully.",
+      message: "Password reset successfully. Confirmation email sent.",
     });
   } catch (error) {
     console.error(error);

@@ -3,22 +3,22 @@ import { signupSchema } from "@/zodSchema/authSchema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Mail, Lock, Eye, EyeOff, Phone, Loader2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Label } from "@/components/ui/label";
 import type { SignupInterface } from "@/types/auth";
+import { useUserStore } from "@/zustand/useUserStore";
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-
+  const { signup, loading } = useUserStore();
   const [errors, setErrors] = useState<Partial<SignupInterface>>({});
 
   const [signupData, setSignupData] = useState<SignupInterface>({
-    fullName: "",
+    fullname: "",
     email: "",
     contact: "",
     password: "",
-    confirmPassword: "",
   });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -28,16 +28,14 @@ const Signup = () => {
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+
     setErrors({});
 
     const validation = signupSchema.safeParse(signupData);
 
     if (!validation.success) {
-      setLoading(false);
-
       const fieldErrors: Partial<SignupInterface> = {};
       validation.error.issues.forEach((issue) => {
         const field = issue.path[0] as keyof SignupInterface;
@@ -47,12 +45,12 @@ const Signup = () => {
       setErrors(fieldErrors);
       return;
     }
-
-    setTimeout(() => {
-      setLoading(false);
-      console.log("✅ Signup Data:", signupData);
-      alert("Signup successful!");
-    }, 1500);
+    try {
+      await signup(signupData);
+      navigate("/verify-email");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -67,15 +65,15 @@ const Signup = () => {
             <Label htmlFor="fullName">Full Name</Label>
             <Input
               id="fullName"
-              name="fullName"
+              name="fullname"
               type="text"
               placeholder="Enter your full name"
-              className={errors.fullName ? "border-red-500" : ""}
-              value={signupData.fullName}
+              className={errors.fullname ? "border-red-500" : ""}
+              value={signupData.fullname}
               onChange={handleChange}
             />
-            {errors.fullName && (
-              <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>
+            {errors.fullname && (
+              <p className="mt-1 text-sm text-red-600">{errors.fullname}</p>
             )}
           </div>
 
@@ -124,7 +122,7 @@ const Signup = () => {
           </div>
 
           <div>
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="confirmPassword"> Password</Label>
             <div className="relative mt-2">
               <Lock
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -141,30 +139,6 @@ const Signup = () => {
                 value={signupData.password}
                 onChange={handleChange}
               />
-            </div>
-            {errors.password && (
-              <p className="mt-1 text-sm text-red-600">{errors.password}</p>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <div className="relative mt-2">
-              <Lock
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                size={18}
-              />
-              <Input
-                id="confirmPassword"
-                name="confirmPassword"
-                type={showPassword ? "text" : "password"}
-                placeholder="Confirm your password"
-                className={`pl-10 pr-10 ${
-                  errors.confirmPassword ? "border-red-500" : ""
-                }`}
-                value={signupData.confirmPassword}
-                onChange={handleChange}
-              />
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
@@ -173,10 +147,8 @@ const Signup = () => {
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
-            {errors.confirmPassword && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.confirmPassword}
-              </p>
+            {errors.password && (
+              <p className="mt-1 text-sm text-red-600">{errors.password}</p>
             )}
           </div>
 

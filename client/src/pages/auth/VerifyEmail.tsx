@@ -3,14 +3,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useUserStore } from "@/zustand/useUserStore";
 
 const VerifyEmail = () => {
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
   const inputRef = useRef<Array<HTMLInputElement | null>>([]);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
   const navigate = useNavigate();
-
+  const { verifyEmail, loading } = useUserStore();
   const handleChange = (index: number, value: string) => {
     if (!/^[0-9]?$/.test(value)) return;
 
@@ -32,7 +32,7 @@ const VerifyEmail = () => {
     }
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     const otpValue = otp.join("");
@@ -40,20 +40,17 @@ const VerifyEmail = () => {
       setError("Please enter all 6 digits");
       return;
     }
-
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      console.log("✅ OTP Verified:", otpValue);
-      alert("Email verified successfully!");
-      navigate("/login");
-    }, 1500);
+    try {
+      await verifyEmail(otpValue);
+      navigate('/')
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4 sm:px-6">
       <div className="w-full max-w-md bg-white rounded-xl border border-gray-200 p-6 sm:p-8 shadow-sm">
-        {/* Header */}
         <div className="text-center mb-6">
           <h1 className="font-extrabold text-2xl sm:text-3xl text-gray-900">
             Verify your email
@@ -63,7 +60,6 @@ const VerifyEmail = () => {
           </p>
         </div>
 
-        {/* OTP Form */}
         <form onSubmit={handleSubmit}>
           <div className="flex justify-between gap-2 sm:gap-3 mb-4">
             {otp.map((digit, idx) => (
@@ -86,12 +82,10 @@ const VerifyEmail = () => {
             ))}
           </div>
 
-          {/* Error */}
           {error && (
             <p className="text-sm text-red-600 text-center mb-3">{error}</p>
           )}
 
-          {/* Button */}
           {loading ? (
             <Button
               disabled
@@ -110,7 +104,6 @@ const VerifyEmail = () => {
           )}
         </form>
 
-        {/* Footer */}
         <div className="mt-5 text-center text-sm text-gray-600 space-y-2">
           <p>
             Didn’t receive the code?{" "}
