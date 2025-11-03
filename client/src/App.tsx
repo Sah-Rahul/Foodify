@@ -38,7 +38,7 @@ const App = () => {
       <div className="min-h-[80vh] pt-16">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/search-food/:id" element={<SearchFood />} />
+          <Route path="/search-food/:searchText" element={<SearchFood />} />
           <Route path="/resturent/:id" element={<ResturentMenu />} />
 
           <Route
