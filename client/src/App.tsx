@@ -27,7 +27,6 @@ import Loading from "./components/clientUi/Loading";
 
 const App = () => {
   const { checkAuthentication, isCheckingAuth } = useUserStore();
-  // checking auth every time when page is loaded
   useEffect(() => {
     checkAuthentication();
   }, []);

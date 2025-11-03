@@ -1,4 +1,4 @@
-import { Orders } from "@/types/orderType";
+// import { Orders } from "@/types/orderType";
 import { MenuItem, RestaurantState } from "@/types/restaurantType";
 import axios from "axios";
 import { toast } from "sonner";
@@ -95,7 +95,7 @@ export const useRestaurantStore = create<RestaurantState>()(
       },
 
       addMenuToRestaurant: (menu: MenuItem) => {
-        set((state) => ({
+        set((state:any) => ({
           restaurant: state.restaurant
             ? { ...state.restaurant, menus: [...state.restaurant.menus, menu] }
             : null,
@@ -103,10 +103,10 @@ export const useRestaurantStore = create<RestaurantState>()(
       },
 
       updateMenuToRestaurant: (updatedMenu: MenuItem) => {
-        set((state) => {
+        set((state:any) => {
           if (!state.restaurant) return state;
 
-          const updatedMenus = state.restaurant.menus.map((menu) =>
+          const updatedMenus = state.restaurant.menus.map((menu:any) =>
             menu._id === updatedMenu._id ? updatedMenu : menu
           );
           return {
@@ -116,7 +116,7 @@ export const useRestaurantStore = create<RestaurantState>()(
       },
 
       setAppliedFilter: (value: string) => {
-        set((state) => {
+        set((state:any) => {
           const isApplied = state.appliedFilter.includes(value);
           return {
             appliedFilter: isApplied
@@ -158,7 +158,7 @@ export const useRestaurantStore = create<RestaurantState>()(
             { headers: { "Content-Type": "application/json" } }
           );
           if (response.data.success) {
-            const updatedOrders = get().restaurantOrder.map((order) =>
+            const updatedOrders = get().restaurantOrder.map((order:any) =>
               order._id === orderId
                 ? { ...order, status: response.data.status }
                 : order

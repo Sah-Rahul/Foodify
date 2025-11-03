@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import type { addMenuInterface } from "@/types/auth";
 import { addMenuSchema } from "@/zodSchema/resturentSchema";
+import { useMenuStore } from "@/zustand/useMenuStore";
 
 interface MenuItem extends addMenuInterface {
   _id: string;
@@ -37,8 +38,8 @@ const EditMenu = ({
   const [errors, setErrors] = useState<
     Partial<Record<keyof addMenuInterface, string>>
   >({});
-  const [loading, setLoading] = useState(false);
 
+  const { editMenu, loading } = useMenuStore();
   useEffect(() => {
     if (selectedMenu) {
       setInput({
@@ -59,7 +60,7 @@ const EditMenu = ({
     });
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const validation = addMenuSchema.safeParse(input);
 
@@ -74,13 +75,22 @@ const EditMenu = ({
     }
 
     setErrors({});
-    setLoading(true);
+    try {
+      if (!selectedMenu?._id) return;
 
-    setTimeout(() => {
-      setLoading(false);
+      const formData = new FormData();
+      formData.append("name", input.name);
+      formData.append("description", input.description);
+      formData.append("price", input.price.toString());
+      if (input.imageFile) formData.append("imageFile", input.imageFile);
+
+      await editMenu(selectedMenu._id, formData);
+
       setEditOpen(false);
-      console.log("Edited Menu:", input);
-    }, 1500);
+      setInput({ name: "", description: "", price: 0, imageFile: undefined });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   if (!selectedMenu) return null;
@@ -163,7 +173,7 @@ const EditMenu = ({
             ) : (
               <Button
                 type="submit"
-                className="bg-orange-500 hover:bg-hoverOrange"
+                className="bg-orange-500 cursor-pointer hover:bg-hoverOrange"
               >
                 Submit
               </Button>

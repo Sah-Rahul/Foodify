@@ -9,7 +9,9 @@ export const addMenu = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { name, description, price } = req.body;
     const file = req.file;
-
+    console.log("Incoming form data:", req.body);
+    console.log("File:", req.file);
+    
     if (!name || !description || !price) {
       return res.status(400).json({
         success: false,

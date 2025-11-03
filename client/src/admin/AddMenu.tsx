@@ -15,8 +15,9 @@ import { addMenuSchema } from "@/zodSchema/resturentSchema";
 import { Loader2, Plus } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import EditMenu from "./EditMenu";
+import { useMenuStore } from "@/zustand/useMenuStore";
+import { useRestaurantStore } from "@/zustand/useRestaurantStore";
 
- 
 type MenuItem = addMenuInterface & {
   _id: string;
 };
@@ -24,7 +25,8 @@ type MenuItem = addMenuInterface & {
 const AddMenu = () => {
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { createMenu, loading } = useMenuStore();
+  const { restaurant } = useRestaurantStore();
   const [selectedMenu, setSelectedMenu] = useState<MenuItem | null>(null);
 
   const [input, setInput] = useState<addMenuInterface>({
@@ -46,7 +48,7 @@ const AddMenu = () => {
     });
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const validation = addMenuSchema.safeParse(input);
 
@@ -61,35 +63,21 @@ const AddMenu = () => {
     }
 
     setErrors({});
-    setLoading(true);
 
-    setTimeout(() => {
-      setLoading(false);
-      setOpen(false);
-      console.log("Added Menu:", input);
-    }, 1500);
+    try {
+      const formData = new FormData();
+      formData.append("name", input.name);
+      formData.append("description", input.description);
+      formData.append("price", input.price.toString());
+      if (input.imageFile) formData.append("imageFile", input.imageFile);
+
+      await createMenu(formData);
+      setEditOpen(false);
+      setSelectedMenu(null);
+    } catch (error) {
+      console.log(error);
+    }
   };
-
-  const menus: MenuItem[] = [
-    {
-      _id: "1",
-      name: "Paneer Tikka",
-      description: "Spicy grilled paneer cubes",
-      price: 120,
-    },
-    {
-      _id: "2",
-      name: "Butter Naan",
-      description: "Soft Indian bread",
-      price: 40,
-    },
-    {
-      _id: "3",
-      name: "Veg Biryani",
-      description: "Spiced rice with vegetables",
-      price: 150,
-    },
-  ];
 
   const handleEditClick = (menu: MenuItem) => {
     setSelectedMenu(menu);
@@ -206,13 +194,13 @@ const AddMenu = () => {
       </div>
 
       <div className="mt-6 space-y-4">
-        {menus.map((menu) => (
+        {restaurant?.menus.map((menu: any) => (
           <div
             key={menu._id}
             className="flex flex-col md:flex-row md:items-center md:space-x-4 md:p-4 p-2 shadow-md rounded-lg border"
           >
             <img
-              src="https://images.pexels.com/photos/5409009/pexels-photo-5409009.jpeg"
+              src={menu.image}
               alt={menu.name}
               className="md:h-24 md:w-24 h-16 w-full object-cover rounded-lg"
             />
