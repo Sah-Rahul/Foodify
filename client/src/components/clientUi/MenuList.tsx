@@ -62,11 +62,6 @@ const MenuList = ({ menus }: MenuListProps) => {
               Rs{menu.price}
             </span>
             <button
-//             ah/Desktop/Foodify/client/src/types/restaurantType").MenuItem'.
-//   Types of property 'description' are incompatible.
-//     Type 'string | undefined' is not assignable to type 'string'.
-//       Type 'undefined' is not assignable to type 'string'.ts(2345)
-// (parameter) menu: MenuItem
               onClick={() => addToCart(menu)}
               className="cursor-pointer bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-md transition-colors"
             >

@@ -54,7 +54,7 @@ const Footer = () => {
               <Mail size={16} /> support@foodify.com
             </li>
             <li className="flex items-center gap-2">
-              <Phone size={16} /> +977 98765 43210
+              <Phone size={16} /> +977 98111 22334
             </li>
             <li className="flex items-center gap-2">
               <MapPin size={16} /> Kathmandu, Nepal

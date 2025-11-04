@@ -4,9 +4,7 @@ import { Order, IOrder } from "../models/order.model";
 import Stripe from "stripe";
 import { AuthenticatedRequest } from "../middleware/auth.middleware";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-10-29.clover",
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 type CheckoutSessionRequest = {
   cartItems: {

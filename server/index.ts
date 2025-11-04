@@ -2,16 +2,16 @@ import express, { urlencoded } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-import bodyParser from "body-parser";
 import { connectDB } from "./src/config/db.ts";
 dotenv.config();
 
-// routes
 import "./src/models";
 import userRouter from "./src/routes/user.routes.ts";
 import resturentRouter from "./src/routes/restaurant.route.ts";
 import orderRouter from "./src/routes/order.route.ts";
 import menuRouter from "./src/routes/menu.routes.ts";
+
+import { stripeWebhook } from "./src/controllers/order.controller.ts";
 
 const app = express();
 
@@ -22,9 +22,16 @@ app.use(
   })
 );
 
+app.use(cookieParser());
+
+app.post(
+  "/api/v1/order/webhook",
+  express.raw({ type: "application/json" }),
+  stripeWebhook
+);
+
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
-app.use(cookieParser());
 
 connectDB();
 

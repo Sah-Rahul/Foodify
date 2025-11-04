@@ -7,7 +7,7 @@ import {
   MenubarMenu,
   MenubarTrigger,
 } from "../ui/menubar";
-import { Sun, Moon, ShoppingCart, User, Menu, X, Loader2 } from "lucide-react";
+import { Sun, Moon, ShoppingCart, Menu, X, Loader2 } from "lucide-react";
 import { useUserStore } from "@/zustand/useUserStore";
 import { useCartStore } from "@/zustand/useCartStore";
 
@@ -111,31 +111,39 @@ const Navbar = () => {
                 {cart.length}
               </span>
             </Link>
-
             <Link
               to="/profile"
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
             >
-              <User className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+              <div className="h-8 w-8   rounded-full">
+                <img
+                  src={user?.profilePicture}
+                  alt="userpic"
+                  className="h-full w-full rounded-full"
+                />
+              </div>
             </Link>
 
-            <Link
-              to="/login"
-              className="hidden md:block bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition"
-            >
-              Login
-            </Link>
-            {loading ? (
-              <Loader2 />
-            ) : (
+            {user ? (
               <>
-                <button
-                  onClick={logoutHandler}
-                  className="hidden cursor-pointer md:block bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition"
-                >
-                  Logout
-                </button>
+                {loading ? (
+                  <Loader2 />
+                ) : (
+                  <button
+                    onClick={logoutHandler}
+                    className="hidden md:block bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition cursor-pointer"
+                  >
+                    Logout
+                  </button>
+                )}
               </>
+            ) : (
+              <Link
+                to="/login"
+                className="hidden md:block bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition"
+              >
+                Login
+              </Link>
             )}
 
             <button

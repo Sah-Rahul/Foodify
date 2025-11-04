@@ -1,4 +1,6 @@
-import { useState, type Dispatch, type SetStateAction } from "react";
+import { useState } from "react";
+import type { FormEvent, Dispatch, SetStateAction } from "react";
+
 import {
   Dialog,
   DialogContent,
@@ -9,7 +11,13 @@ import {
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { Loader2 } from "lucide-react";
+
 import { useUserStore } from "@/zustand/useUserStore";
+import { useCartStore } from "@/zustand/useCartStore";
+import { useRestaurantStore } from "@/zustand/useRestaurantStore";
+import { useOrderStore } from "@/zustand/useOrderStore";
+import type { CheckoutSessionRequest } from "@/types/orderType";
 
 const Checkout = ({
   open,
@@ -18,25 +26,44 @@ const Checkout = ({
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }) => {
-
   const { user } = useUserStore();
+  const { cart } = useCartStore();
+  const { restaurant } = useRestaurantStore();
+  const { createCheckoutSession, loading } = useOrderStore();
+
   const [input, setInput] = useState({
     name: user?.fullname || "",
-    email: user?.email || " ",
-    contact: user?.contact || "",
+    email: user?.email || "",
+    contact: user?.contact?.toString() || "",
     address: user?.address || "",
     city: user?.city || "",
     country: user?.country || "",
   });
 
-  const handlerEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setInput({ ...input, [name]: value });
+    setInput((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form values:", input);
+    try {
+      const checkoutData: CheckoutSessionRequest = {
+        cartItems: cart.map((item) => ({
+          menuId: item._id,
+          name: item.name,
+          image: item.image,
+          price: item.price.toString(),
+          quantity: item.quantity.toString(),
+        })),
+        deliveryDetails: input,
+        restaurantId: restaurant?._id as string,
+      };
+
+      await createCheckoutSession(checkoutData);
+    } catch (error) {
+      console.error("Checkout failed:", error);
+    }
   };
 
   return (
@@ -46,108 +73,100 @@ const Checkout = ({
           Review Your Order
         </DialogTitle>
         <DialogDescription className="text-sm sm:text-base mb-6 text-gray-600 dark:text-gray-400">
-          Double-check your delivery details and ensure everything is in order.
-          When you are ready, hit confirm button to finalize your order.
+          Double-check your delivery details and ensure everything is correct.
+          When ready, hit confirm to proceed to payment.
         </DialogDescription>
 
         <form
+          onSubmit={handleSubmit}
           className="grid grid-cols-1 sm:grid-cols-2 gap-4"
           noValidate
-          onSubmit={handleSubmit}
         >
           <div>
-            <Label className="mb-2" htmlFor="name">
-              Fullname
-            </Label>
+            <Label htmlFor="name">Fullname</Label>
             <Input
               id="name"
               type="text"
               name="name"
               value={input.name}
-              onChange={handlerEvent}
+              onChange={handleChange}
               placeholder="Enter full name"
             />
           </div>
 
           <div>
-            <Label className="mb-2" htmlFor="email">
-              Email
-            </Label>
+            <Label htmlFor="email">Email</Label>
             <Input
               id="email"
               type="email"
               name="email"
-              disabled
               value={input.email}
+              disabled
               className="cursor-not-allowed bg-gray-100"
-              aria-readonly="true"
-              onChange={handlerEvent}
             />
           </div>
 
           <div>
-            <Label className="mb-2" htmlFor="contact">
-              Contact
-            </Label>
+            <Label htmlFor="contact">Contact</Label>
             <Input
               id="contact"
-              type="number"
+              type="text"
               name="contact"
               value={input.contact}
-              onChange={handlerEvent}
+              onChange={handleChange}
               placeholder="Phone number"
             />
           </div>
 
           <div>
-            <Label className="mb-2" htmlFor="address">
-              Address
-            </Label>
+            <Label htmlFor="address">Address</Label>
             <Input
               id="address"
               type="text"
               name="address"
               value={input.address}
-              onChange={handlerEvent}
+              onChange={handleChange}
               placeholder="Delivery address"
             />
           </div>
 
           <div>
-            <Label className="mb-2" htmlFor="city">
-              City
-            </Label>
+            <Label htmlFor="city">City</Label>
             <Input
               id="city"
               type="text"
               name="city"
               value={input.city}
-              onChange={handlerEvent}
+              onChange={handleChange}
               placeholder="City"
             />
           </div>
 
           <div>
-            <Label className="mb-2" htmlFor="country">
-              Country
-            </Label>
+            <Label htmlFor="country">Country</Label>
             <Input
               id="country"
               type="text"
               name="country"
               value={input.country}
-              onChange={handlerEvent}
+              onChange={handleChange}
               placeholder="Country"
             />
           </div>
 
           <DialogFooter className="col-span-1 sm:col-span-2 pt-6 flex justify-end">
-            <Button
-              type="submit"
-              className="cursor-pointer bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-md"
-            >
-              Continue To Payment
-            </Button>
+            {loading ? (
+              <Button disabled className="bg-orange-500 hover:bg-orange-600">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                className="cursor-pointer bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-md"
+              >
+                Continue To Payment
+              </Button>
+            )}
           </DialogFooter>
         </form>
       </DialogContent>
