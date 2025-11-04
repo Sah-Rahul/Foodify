@@ -6,7 +6,7 @@ export interface IRestaurant {
   city: string;
   country: string;
   deliveryTime: number;
-  cuisines: string[];
+  cuisines: string[];z
   imageUrl: string;
   menus: mongoose.Schema.Types.ObjectId[];
 }

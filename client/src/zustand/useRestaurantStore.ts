@@ -1,5 +1,4 @@
-// import { Orders } from "@/types/orderType";
-import { MenuItem, RestaurantState } from "@/types/restaurantType";
+import type { MenuItem, RestaurantState } from "@/types/restaurantType";
 import axios from "axios";
 import { toast } from "sonner";
 import { create } from "zustand";
@@ -73,29 +72,30 @@ export const useRestaurantStore = create<RestaurantState>()(
       searchRestaurant: async (
         searchText: string,
         searchQuery: string,
-        selectedCuisines: string[]
+        selectedCuisines: any
       ) => {
         try {
           set({ loading: true });
+
           const params = new URLSearchParams();
           params.set("searchQuery", searchQuery);
           params.set("selectedCuisines", selectedCuisines.join(","));
 
+          // await new Promise((resolve) => setTimeout(resolve, 2000));
           const response = await axios.get(
             `${API_END_POINT}/search/${searchText}?${params.toString()}`
           );
           if (response.data.success) {
-            set({ searchedRestaurant: response.data });
+            set({ loading: false, searchedRestaurant: response.data });
           }
+          console.log('------------------------>',response.data)
         } catch (error) {
-          console.log(error);
-        } finally {
           set({ loading: false });
         }
       },
 
       addMenuToRestaurant: (menu: MenuItem) => {
-        set((state:any) => ({
+        set((state: any) => ({
           restaurant: state.restaurant
             ? { ...state.restaurant, menus: [...state.restaurant.menus, menu] }
             : null,
@@ -103,10 +103,10 @@ export const useRestaurantStore = create<RestaurantState>()(
       },
 
       updateMenuToRestaurant: (updatedMenu: MenuItem) => {
-        set((state:any) => {
+        set((state: any) => {
           if (!state.restaurant) return state;
 
-          const updatedMenus = state.restaurant.menus.map((menu:any) =>
+          const updatedMenus = state.restaurant.menus.map((menu: any) =>
             menu._id === updatedMenu._id ? updatedMenu : menu
           );
           return {
@@ -116,11 +116,11 @@ export const useRestaurantStore = create<RestaurantState>()(
       },
 
       setAppliedFilter: (value: string) => {
-        set((state:any) => {
+        set((state: any) => {
           const isApplied = state.appliedFilter.includes(value);
           return {
             appliedFilter: isApplied
-              ? state.appliedFilter.filter((f) => f !== value)
+              ? state.appliedFilter.filter((f: any) => f !== value)
               : [...state.appliedFilter, value],
           };
         });
@@ -134,6 +134,7 @@ export const useRestaurantStore = create<RestaurantState>()(
           if (response.data.success) {
             set({ singleRestaurant: response.data.restaurant });
           }
+          console.log(response.data)
         } catch (error) {
           console.log(error);
         }
@@ -158,7 +159,7 @@ export const useRestaurantStore = create<RestaurantState>()(
             { headers: { "Content-Type": "application/json" } }
           );
           if (response.data.success) {
-            const updatedOrders = get().restaurantOrder.map((order:any) =>
+            const updatedOrders = get().restaurantOrder.map((order: any) =>
               order._id === orderId
                 ? { ...order, status: response.data.status }
                 : order
@@ -171,7 +172,7 @@ export const useRestaurantStore = create<RestaurantState>()(
         }
       },
     }),
-   {
+    {
       name: "restaurent-storage",
       storage: createJSONStorage(() => localStorage),
     }

@@ -12,27 +12,14 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useState } from "react";
 import Checkout from "./Checkout";
+import { useCartStore } from "@/zustand/useCartStore";
+import type { CartItem } from "@/types/cartType";
 
 const Cart = () => {
   const [open, setOpen] = useState<boolean>(false);
 
-  const cart = [
-    {
-      _id: "1",
-      name: "Margherita Pizza",
-      price: 12,
-      quantity: 2,
-      image: "https://source.unsplash.com/100x100/?pizza",
-    },
-    {
-      _id: "2",
-      name: "Garlic Bread",
-      price: 5,
-      quantity: 1,
-      image: "https://source.unsplash.com/100x100/?bread",
-    },
-  ];
-
+  const { cart, incrementQuantity, decrementQuantity, removeFromTheCart } =
+    useCartStore();
   const totalAmount = cart.reduce(
     (acc, item) => acc + item.price * item.quantity,
     0
@@ -45,10 +32,14 @@ const Cart = () => {
       .join("")
       .toUpperCase();
 
+  console.log(cart);
   return (
     <div className="flex flex-col max-w-7xl mx-auto my-10 px-4 sm:px-6 lg:px-8">
       <div className="flex justify-end mb-4">
-        <Button variant="link" className="text-orange-600 hover:text-orange-800">
+        <Button
+          variant="link"
+          className="text-orange-600 hover:text-orange-800"
+        >
           Clear All
         </Button>
       </div>
@@ -67,7 +58,7 @@ const Cart = () => {
           </TableHeader>
 
           <TableBody>
-            {cart.map((item) => (
+            {cart.map((item: CartItem) => (
               <TableRow
                 key={item._id}
                 className="hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -82,11 +73,19 @@ const Cart = () => {
                 <TableCell>${item.price}</TableCell>
                 <TableCell>
                   <div className="flex items-center border rounded-full shadow-md overflow-hidden max-w-[140px]">
-                    <Button size="icon" variant="outline" className="bg-gray-200 rounded-none px-2">
+                    <Button
+                      onClick={() => decrementQuantity(item?._id)}
+                      size="icon"
+                      variant="outline"
+                      className="bg-gray-200  cursor-pointer rounded-none px-2"
+                    >
                       <Minus />
                     </Button>
-                    <div className="px-4 font-bold text-center flex-1">{item.quantity}</div>
+                    <div className="px-4 font-bold text-center flex-1">
+                      {item.quantity}
+                    </div>
                     <Button
+                      onClick={() => incrementQuantity(item?._id)}
                       size="icon"
                       variant="outline"
                       className="bg-orange-500 cursor-pointer hover:bg-orange-600 rounded-none px-2 text-white"
@@ -98,6 +97,7 @@ const Cart = () => {
                 <TableCell>${item.price * item.quantity}</TableCell>
                 <TableCell className="text-right">
                   <Button
+                    onClick={() => removeFromTheCart(item?._id)}
                     size="sm"
                     className="bg-orange-500 cursor-pointer hover:bg-orange-600 text-white"
                   >

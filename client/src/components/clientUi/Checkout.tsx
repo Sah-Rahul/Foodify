@@ -9,6 +9,7 @@ import {
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { useUserStore } from "@/zustand/useUserStore";
 
 const Checkout = ({
   open,
@@ -17,13 +18,15 @@ const Checkout = ({
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }) => {
+
+  const { user } = useUserStore();
   const [input, setInput] = useState({
-    name: "",
-    email: " ",
-    contact: "",
-    address: "",
-    city: "",
-    country: "",
+    name: user?.fullname || "",
+    email: user?.email || " ",
+    contact: user?.contact || "",
+    address: user?.address || "",
+    city: user?.city || "",
+    country: user?.country || "",
   });
 
   const handlerEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,6 +77,7 @@ const Checkout = ({
               id="email"
               type="email"
               name="email"
+              disabled
               value={input.email}
               className="cursor-not-allowed bg-gray-100"
               aria-readonly="true"

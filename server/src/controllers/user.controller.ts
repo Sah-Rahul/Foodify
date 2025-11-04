@@ -213,6 +213,11 @@ export const updateProfile = async (req: Request, res: Response) => {
     const { fullname, email, address, city, country, profilePicture } =
       req.body;
 
+    console.log("=== UPDATE PROFILE DEBUG ===");
+    console.log("userId:", userId);
+    console.log("profilePicture received:", profilePicture ? "YES" : "NO");
+    console.log("profilePicture length:", profilePicture?.length);
+
     let cloudResponse: any;
     if (profilePicture) {
       cloudResponse = await cloudinary.uploader.upload(profilePicture);

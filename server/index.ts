@@ -7,11 +7,11 @@ import { connectDB } from "./src/config/db.ts";
 dotenv.config();
 
 // routes
-import "./src/models"; 
+import "./src/models";
 import userRouter from "./src/routes/user.routes.ts";
 import resturentRouter from "./src/routes/restaurant.route.ts";
-import orderRouter from "./src/routes/order.route.ts";  
-import menuRouter from "./src/routes/menu.routes.ts"; 
+import orderRouter from "./src/routes/order.route.ts";
+import menuRouter from "./src/routes/menu.routes.ts";
 
 const app = express();
 
@@ -21,11 +21,10 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json());
+
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());
-app.use(express.json());
-app.use(bodyParser.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 connectDB();
 
@@ -33,7 +32,6 @@ app.use("/api/v1/user", userRouter);
 app.use("/api/v1/restaurant", resturentRouter);
 app.use("/api/v1/order", orderRouter);
 app.use("/api/v1/menu", menuRouter);
-
 
 app.get("/", (req, res) => {
   res.send("✅ TypeScript + Express backend running successfully!");

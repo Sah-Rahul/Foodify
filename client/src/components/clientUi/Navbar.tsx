@@ -9,12 +9,14 @@ import {
 } from "../ui/menubar";
 import { Sun, Moon, ShoppingCart, User, Menu, X, Loader2 } from "lucide-react";
 import { useUserStore } from "@/zustand/useUserStore";
+import { useCartStore } from "@/zustand/useCartStore";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { user, logout, loading } = useUserStore();
+  const { cart } = useCartStore();
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -106,7 +108,7 @@ const Navbar = () => {
             >
               <ShoppingCart className="w-5 h-5 text-gray-700 dark:text-gray-300" />
               <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
-                3
+                {cart.length}
               </span>
             </Link>
 

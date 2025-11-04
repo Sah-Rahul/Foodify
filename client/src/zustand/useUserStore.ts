@@ -3,7 +3,6 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import axios from "axios";
 import type { LoginInterface, SignupInterface } from "@/types/auth";
 import { toast } from "sonner";
- 
 
 const API_END_POINT = "http://localhost:3000/api/v1/user";
 axios.defaults.withCredentials = true;
@@ -188,12 +187,21 @@ export const useUserStore = create<UserState>()(
         }
       },
 
-      updateProfile: async (input) => {
+      updateProfile: async (input: any) => {
         try {
+          set({ loading: true });
+
+          // ✅ Log to debug
+          console.log("Updating profile with:", input);
+
           const { data } = await axios.put(
             `${API_END_POINT}/update-profile`,
             input,
-            { headers: { "Content-Type": "application/json" } }
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
           );
 
           if (data.success) {
@@ -201,7 +209,10 @@ export const useUserStore = create<UserState>()(
             set({ user: data.user, isAuthenticated: true });
           }
         } catch (error: any) {
+          console.error("Update error:", error);
           toast.error(error.response?.data?.message || "Profile update failed");
+        } finally {
+          set({ loading: false });
         }
       },
     }),

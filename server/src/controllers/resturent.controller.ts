@@ -36,7 +36,7 @@ export const createRestaurant = async (req: Request, res: Response) => {
     const imageUrl = await uploadImageOnCloudinary(file as Express.Multer.File);
 
     await Restaurant.create({
-      user: (req as any).userId, 
+      user: (req as any).userId,
       restaurantName,
       city,
       country,
@@ -81,7 +81,7 @@ export const updateRestaurant = async (req: Request, res: Response) => {
     const { restaurantName, city, country, deliveryTime, cuisines } = req.body;
     const file = req.file;
 
-    const restaurant = await Restaurant.findOne({ user: (req as any).userId });  
+    const restaurant = await Restaurant.findOne({ user: (req as any).userId });
     if (!restaurant) {
       return res.status(404).json({
         success: false,
@@ -178,35 +178,24 @@ export const searchRestaurant = async (req: Request, res: Response) => {
       .split(",")
       .filter((cuisine) => cuisine);
 
+    // console.log("=== SEARCH DEBUG ===");
+    // console.log("searchText:", searchText);
+    // console.log("searchQuery:", searchQuery);
+    // console.log("selectedCuisines:", selectedCuisines);
+
     const query: any = {};
 
-    if (searchText) {
-      query.$or = [
-        { restaurantName: { $regex: searchText, $options: "i" } },
-        { city: { $regex: searchText, $options: "i" } },
-        { country: { $regex: searchText, $options: "i" } },
-      ];
-    }
-
-    if (searchQuery) {
-      query.$or = [
-        { restaurantName: { $regex: searchQuery, $options: "i" } },
-        { cuisines: { $regex: searchQuery, $options: "i" } },
-      ];
-    }
-
-    if (selectedCuisines.length > 0) {
-      query.cuisines = { $in: selectedCuisines };
-    }
+    console.log("Final Query:", JSON.stringify(query, null, 2));
 
     const restaurants = await Restaurant.find(query);
+    console.log("Found restaurants:", restaurants.length);
 
     return res.status(200).json({
       success: true,
       data: restaurants,
     });
   } catch (error) {
-    console.error("Error in searchRestaurant:", error);
+    console.log(error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
